@@ -3,8 +3,19 @@ require 'json'
 
 class CoordsController < ApplicationController
   def fetch_weather
-    @latitude = 42.0538387
-    @longitude = -87.67721
+
+    @address = params[:address]
+    @url_safe_address = URI.encode(@address)
+
+    url_coord = "http://maps.googleapis.com/maps/api/geocode/json?address=#{@url_safe_address}&sensor=false"
+
+    raw_data_coord = open(url_coord).read
+
+    parsed_data_coord = JSON.parse(raw_data_coord)
+   
+    @latitude = parsed_data_coord["results"][0]["geometry"]["location"]["lat"]
+    @longitude = parsed_data_coord["results"][0]["geometry"]["location"]["lng"]
+
     your_api_key = "1157e966738c925c876d619c9fc2af02"
 
     url = "https://api.forecast.io/forecast/1157e966738c925c876d619c9fc2af02/#{@latitude},#{@longitude}"
@@ -20,14 +31,5 @@ class CoordsController < ApplicationController
 
 
 
-
-    # Your code goes here.
-    # url = ?
-    # raw_data = ?
-    # parsed_data = ?
-    # @temperature = ?
-    # @minutely_summary = ?
-    # @hourly_summary = ?
-    # @daily_summary = ?
   end
 end
